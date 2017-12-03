@@ -3,11 +3,27 @@ import numpy as np
 from math import *
 
 class AuxiliaryMath:
-    #sigmoid function
+
+    #vector sigmoid function
     @staticmethod
     def sigmoid (x):
         g = np.vectorize (lambda x: 1/(1+exp(-x)))
         return g(x)
+
+    #first derivative of vector sigmoid function
+    @staticmethod
+    def dsigmoid (x):
+        sigm = lambda x: 1/(1+exp(-x))
+        g = np.vectorize (lambda x: sigma(x)*(1-sigma(x)))
+        return g(x)
+
+class InputReader:
+    def __init__ (self):
+        return 0
+
+class Teacher:
+    def __init__ (self):
+        return 0
 
 class NeuralNet:
     def __init__ (self, inputQuantity, nodesOnLayers): #inputQuantity - int, nodesOnLayers - [int, int, .., int]
@@ -53,4 +69,7 @@ class NeuralNet:
                 self.n[i] = AuxiliaryMath.sigmoid(self.w[i].dot(self.inp)+self.b[i])
             else:
                 self.n[i] = AuxiliaryMath.sigmoid(self.w[i].dot(self.n[i-1])+self.b[i])
-        return None
+
+    def output (self):
+        print (self.n[self.nLayers-1])
+        return self.n[self.nLayers-1]
