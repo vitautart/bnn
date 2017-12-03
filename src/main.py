@@ -25,6 +25,9 @@ class Teacher:
     def __init__ (self):
         return 0
 
+    def backpropagation (self):
+        return 0;
+
 class NeuralNet:
     def __init__ (self, inputQuantity, nodesOnLayers): #inputQuantity - int, nodesOnLayers - [int, int, .., int]
         self.nNodes = 0
