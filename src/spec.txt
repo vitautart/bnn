@@ -1,0 +1,22 @@
+\n - divide "net structure", "w matrices" and "b vectors" Divider -"\n"
+---
+"net structure"\n
+"w matrices"\n
+"b vectors"\n
+---
+
+"net structure" - list of quantity (yx) of nodes on each layers. Divider - ' '
+---
+ y1 y2 y3 y4\n
+---
+
+"w matrices" - list of weights (yxx) matrices between each layers. Matrix divider - ":___:", row divider - "__" (double underscore), element divider - ' '
+---
+:___:__ y11 y12 y13 y14__ y21 y22 y23__ y31 y32 y33:___:
+---
+
+
+"b vectors" - list of b vectors for each layer. Vector divider - ":_v_:", element divider - ' '
+---
+:_v_: b1 b2 b3:_v_: b1 b2 b3
+---

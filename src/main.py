@@ -25,9 +25,10 @@ class InputReader:
 
 class NeuralNet:
     def __init__ (self, inputQuantity, nodesOnLayers): #inputQuantity - int, nodesOnLayers - [int, int, .., int]
-        self.nNodes = 0
-        self.nWeights = 0
-        self.nLayers = 0
+        self.nNodes = 0 #quantity of all nodes
+        self.nWeights = 0 #quantity of all weights
+        self.nLayers = 0 #quantity of layers
+        self.lnol = None #list number of nodes on each layers
         self.inp = None # input vector (input nodes)
         self.n = []  # list by layers of nodes vectors
         self.b = []  # list by layers of biases vectors
@@ -36,11 +37,13 @@ class NeuralNet:
         #backpropagator vectors
         self.delta = []
         self.dcdw = []
-        self.dcdb = []
+        self.dcdb = [] #unused because self.dcdb = self.delta
         self.layersIndex = []
         if isinstance(nodesOnLayers, list) and isinstance(inputQuantity, int):
             if all(isinstance(ins, int) for ins in nodesOnLayers):
                 self.nNodes = inputQuantity
+                self.lnol = nodesOnLayers
+                self.lnol.insert(0, inputQuantity)
                 self.nLayers = len(nodesOnLayers)
                 self.layersIndex = range(self.nLayers)
                 self.inp = np.zeros (inputQuantity)
@@ -109,3 +112,44 @@ class NeuralNet:
         self.update ()
         g = np.vectorize (lambda x: pow(x, 2))
         return g(self.output()-desOutp)
+
+    def exportNet (self, filename):
+        fo = open (filename, "w")
+        #q = range(len(self.lnol))
+        for i in self.lnol:
+            fo.write(' '+str(i))
+        fo.write('\n')
+        for matrix in self.w:
+            fo.write(":___:")
+            for row in matrix:
+                fo.write("__")
+                for el in row:
+                    fo.write(' '+str(el))
+        fo.write('\n')
+        for vector in self.b:
+            fo.write(":_v_:")
+            for el in vector:
+                fo.write(' '+str(el))
+        fo.write('\n')
+        fo.close()
+
+    def importNet (self, filename):
+        fo = open (filename, 'r')
+        specStr = fo.readline().rstrip('\n').lstrip(' ').split(' ')
+        wmStrList = fo.readline().rstrip('\n').lstrip(":___:").split(':___:')
+        wmRowStrList = [x.lstrip('__').split("__") for x in wmStrList]
+        wMatrix = []
+        for a in wmRowStrList:
+            wMatrix.append([y.lstrip(' ').split(' ') for y in a])
+        for nm in range(len(wMatrix)):
+            for nr in range(len(wMatrix[nm])):
+                for ne in range(len(wMatrix[nm][nr])):
+                    self.w[nm][nr][ne]= wMatrix[nm][nr][ne]
+        bvStr = fo.readline().rstrip('\n').lstrip(":_v_:").split(':_v_:')
+        bVector = [x.lstrip(' ').split(' ') for x in bvStr]
+
+        for nv in range(len(wMatrix)):
+            for ne in range(len(wMatrix[nv])):
+                self.b[nv][ne] = bVector[nv][ne]
+        #print (bVector)
+        fo.close()
