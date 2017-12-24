@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 import numpy as np
 from math import *
+import random
 
 class AuxiliaryMath:
 
@@ -55,10 +56,10 @@ class NeuralNet:
                         quantityOnPrevious = nodesOnLayers[i-1]
                     self.nNodes += nodesOnLayers[i]
                     self.nWeights = self.nWeights + nodesOnLayers[i]*quantityOnPrevious
-                    self.n.append (np.zeros (nodesOnLayers[i], dtype=np.float)) #initialization of nodes on each layers
-                    self.z.append (np.zeros (nodesOnLayers[i], dtype=np.float))#initialization of arguments of sigmoid on each layers
-                    self.b.append (np.random.rand(nodesOnLayers[i])) #initialization of biases on each layers
-                    self.w.append(np.random.rand(nodesOnLayers[i], quantityOnPrevious)) #initialization of weights on each layers
+                    self.n.append (np.zeros (nodesOnLayers[i], dtype=np.float64)) #initialization of nodes on each layers
+                    self.z.append (np.zeros (nodesOnLayers[i], dtype=np.float64))#initialization of arguments of sigmoid on each layers
+                    self.b.append (np.random.randn(nodesOnLayers[i]).astype(np.float64)) #initialization of biases on each layers
+                    self.w.append(np.random.randn(nodesOnLayers[i], quantityOnPrevious).astype(np.float64)) #initialization of weights on each layers
             else:
                 print ("Quantity of nodes must be integer")
         else:
@@ -66,9 +67,10 @@ class NeuralNet:
 
     def backpropagate (self, desOutp): #desOutp - desirable output vector
         y = np.array(desOutp)
+        self.delta = []
+        self.dcdw = []
         i = self.nLayers-1
         while i>=0:
-            print(i)
             if i == (self.nLayers-1):
                 self.delta.append((self.output()-y) * AuxiliaryMath.dsigmoid (self.z[i]))
             else:
@@ -98,7 +100,7 @@ class NeuralNet:
                 self.n[i] = AuxiliaryMath.sigmoid(self.w[i].dot(self.n[i-1])+self.b[i])
 
 
-    def push (self, eta):
+    def push (self, eta): # push backpropagation data to parametrs of net
         for i in self.layersIndex:
             self.w[i] = self.w[i]-eta*self.dcdw[i]
             self.b[i] = self.b[i]-eta*self.delta[i]
@@ -153,3 +155,39 @@ class NeuralNet:
                 self.b[nv][ne] = bVector[nv][ne]
         #print (bVector)
         fo.close()
+
+    def train (self, labels, images, eras, era_len, eta):
+        if (len(labels)/era_len<eras):
+            print("Too big eras or lenght of era. Please reduce some of them!!!")
+        else:
+            dcdw_era = []
+            delta_era = []
+            data = []
+            for i in range(len(labels)):
+                data.append ([labels[i], images[i]])
+            random.shuffle (data)
+            '''print (data[2])
+            arr = np.zeros ((28, 28), dtype = 'uint8')
+            for i in range(28):
+                for j in range(28):
+                    arr[i][j] = int(data[2][1][i*28+j]*255.0)
+            img = Image.fromarray(arr, mode = 'L')
+            img.show()'''
+            for era in range(eras):
+                print('era: ', era)
+                dcdw_era = []
+                delta_era = []
+                for sample in range(era_len):
+                    self.input(data[era*era_len+sample][1])
+                    self.update()
+                    #if (sample==0 and era == 0): print(data[era*era_len+sample][0])
+                    self.backpropagate(data[era*era_len+sample][0])
+                    #if (sample==0 and era == 0): print(self.delta)
+                    dcdw_era.append (self.dcdw)
+                    delta_era.append (self.delta)
+                    #self.push(eta)
+
+                self.dcdw = list(np.sum(dcdw_era, axis = 0)*(1/era_len))
+                self.delta = list(np.sum(delta_era, axis = 0)*(1/era_len))
+                self.push(eta)
+                #if (era == 0): print (self.delta)

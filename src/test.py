@@ -5,9 +5,10 @@ from math import *
 
 
 
-nn = main.NeuralNet (8, [4, 3, 3])
+nn = main.NeuralNet (8, [3, 3])
 nn.input([0.6, 0.4, 0.6, 0.2, 0.2, 0.8, 0.3, 0.9])
 nn.update()
+print (nn.output())
 print ("This is test!")
 print ("number of layers = " + str(nn.nLayers))
 print ("number of nodes = " + str(nn.nNodes))
@@ -32,5 +33,5 @@ print (nn.output())
 #print (nn.n)
 #print (nn.b)
 #print (nn.w)
-#print (nn.delta)
+print (nn.delta)
 #print (nn.dcdw)
